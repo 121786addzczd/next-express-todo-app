@@ -1,0 +1,2 @@
+# Next.js×ExpreesでTodoアプリ
+TypeScriptベースのNode.jsとExpress,Next.jsを使用して開発する練習用リポジトリ
