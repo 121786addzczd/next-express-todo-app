@@ -80,4 +80,32 @@ app.put('/todos/:id', async (req: Request, res: Response) => {
   }
 });
 
+app.delete('/todos/:id', async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+
+    // IDのバリデーション
+    if (isNaN(id)) {
+      return res.status(400).json({ error: '無効なTodo IDです' });
+    }
+
+    // データベースの更新処理
+    const deleteTodo = await prisma.todo.delete({
+      where: { id }
+    });
+
+    return res.json(deleteTodo);
+  } catch (error) {
+    console.error('Todoの削除中にエラーが発生しました:', error);
+
+    // Prismaでのエラーを判別
+    if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+      // 'P2025' は対象データが見つからない場合のエラーコード
+      return res.status(404).json({ error: 'Todoが見つかりません' });
+    }
+
+    return res.status(500).json({ error: 'Todoの削除中にエラーが発生しました' });
+  }
+});
+
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
