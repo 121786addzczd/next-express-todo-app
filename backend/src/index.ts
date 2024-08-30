@@ -1,11 +1,15 @@
 import express from 'express';
 import type { Express, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client'; 
+import morgan from 'morgan';
+import { PrismaClient } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 const app: Express = express();
 const PORT = 8000;
 
+// ミドルウェアの設定
 app.use(express.json());
+app.use(morgan('dev'));
 
 const prisma = new PrismaClient();
 
