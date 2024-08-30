@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Todo from "./components/Todo";
 import useSWR from "swr";
+import { TodoType } from "./types";
 
 async function fetcher(key: string) {
   return fetch(key).then((res) => res.json());
@@ -9,7 +10,6 @@ async function fetcher(key: string) {
 
 export default function Home() {
   const { data, isLoading, error } = useSWR("http://localhost:8000/todos", fetcher);
-  console.log(data);
 
   return (
     <div
@@ -36,7 +36,10 @@ export default function Home() {
     </div>
   </form>
   <ul className="divide-y divide-gray-200 px-4">
-    <Todo />
+    {data?.map((todo: TodoType) => (
+      <Todo key={todo.id} todo={todo} />
+    ))}
+    
   </ul>
 </div>
   )
