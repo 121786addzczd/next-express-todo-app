@@ -19,14 +19,26 @@ app.get('/todos', async (req: Request, res: Response) => {
 });
 
 app.post('/todos', async (req: Request, res: Response) => {
-  const { title, isCompleted } = req.body;
-  const createTodo = await prisma.todo.create({
-    data: {
-      title,
-      isCompleted
+  try {
+    const { title, isCompleted } = req.body;
+
+    // 入力のバリデーション
+    if (typeof title !== 'string' || typeof isCompleted !== 'boolean') {
+      return res.status(400).json({ error: '無効な入力データです' });
     }
-  });
-  return res.json(createTodo);
+
+    // データベース保存処理
+    const createTodo = await prisma.todo.create({
+      data: {
+        title,
+        isCompleted
+      }
+    });
+    return res.status(201).json(createTodo);
+  } catch (error) {
+    console.error('Todoの作成中にエラーが発生しました:', error);
+    return res.status(500).json({ error: 'Todoの作成中にエラーが発生しました' });
+  }
 });
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
