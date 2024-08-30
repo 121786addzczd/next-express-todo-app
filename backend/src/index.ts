@@ -41,4 +41,43 @@ app.post('/todos', async (req: Request, res: Response) => {
   }
 });
 
+app.put('/todos/:id', async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+
+    // IDのバリデーション
+    if (isNaN(id)) {
+      return res.status(400).json({ error: '無効なTodo IDです' });
+    }
+
+    const { title, isCompleted } = req.body;
+
+    // 入力バリデーション
+    if (typeof title !== 'string' || typeof isCompleted !== 'boolean') {
+      return res.status(400).json({ error: '無効な入力データです' });
+    }
+
+    // データベースの更新処理
+    const editTodo = await prisma.todo.update({
+      where: { id },
+      data: {
+        title,
+        isCompleted,
+      },
+    });
+
+    return res.json(editTodo);
+  } catch (error) {
+    console.error('Todoの更新中にエラーが発生しました:', error);
+
+    // Prismaでのエラーを判別
+    if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+      // 'P2025' は対象データが見つからない場合のエラーコード
+      return res.status(404).json({ error: 'Todoが見つかりません' });
+    }
+
+    return res.status(500).json({ error: 'Todoの更新中にエラーが発生しました' });
+  }
+});
+
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
