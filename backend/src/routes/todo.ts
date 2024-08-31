@@ -40,7 +40,12 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     const { title, isCompleted } = req.body;
 
-    if (typeof title !== 'string' || typeof isCompleted !== 'boolean') {
+    // TODO:フロント側で一旦titleが更新されるか検証したいのでisCompletedのチェックはしない
+    // if (typeof title !== 'string' || typeof isCompleted !== 'boolean') {
+    //   return res.status(400).json({ error: '無効な入力データです' });
+    // }
+
+    if (typeof title !== 'string') {
       return res.status(400).json({ error: '無効な入力データです' });
     }
 
