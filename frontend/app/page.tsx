@@ -16,10 +16,16 @@ export default function Home() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputRef.current) {
-      console.log(`Addボタン押したらフォームに入力した値が見れる:${inputRef.current.value}`);
-    }
-  }
+
+    const response = fetch("http://localhost:8000/todos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        title: inputRef.current?.value,
+        isCompleted: false,
+      })
+    });
+  };
 
   return (
     <div
