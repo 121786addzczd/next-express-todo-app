@@ -1,20 +1,15 @@
 import React, { useState } from 'react'
 import { TodoType } from '../types';
-import useSWR from "swr";
+import { useTodos } from '../hooks/useTodos';
 
 type TodoProps = {
   todo: TodoType;
 }
 
-async function fetcher(key: string) {
-  return fetch(key).then((res) => res.json());
-}
-
 const Todo = ({ todo }: TodoProps) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editedTitle, setEditedTitle] = useState<string>(todo.title);
-
-  const { data, isLoading, error, mutate } = useSWR("http://localhost:8000/todos", fetcher);
+  const { todos, isLoading, error, mutate } = useTodos();
 
   const handleEdit = async () => {
     setIsEditing(!isEditing);
@@ -27,7 +22,7 @@ const Todo = ({ todo }: TodoProps) => {
 
       if (response.ok) {
         const editedTitle = await response.json();
-        mutate([[...data, editedTitle]]);
+        mutate([[...todos, editedTitle]]);
         setEditedTitle("");
       }
     }
