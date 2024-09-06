@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { TodoType } from '../types';
 import { useTodos } from '../hooks/useTodos';
+import { API_URL } from '@/constants/url';
 
 type TodoProps = {
   todo: TodoType;
@@ -14,7 +15,7 @@ const Todo = ({ todo }: TodoProps) => {
   const handleEdit = async () => {
     setIsEditing(!isEditing);
     if (isEditing) {
-      const response = await fetch(`http://localhost:8000/todos/${todo.id}`, {
+      const response = await fetch(`${API_URL}/todos/${todo.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: editedTitle })
@@ -31,7 +32,7 @@ const Todo = ({ todo }: TodoProps) => {
   };
 
   const handleDelete = async (id: number) => {
-    const response = await fetch(`http://localhost:8000/todos/${todo.id}`, {
+    const response = await fetch(`${API_URL}/todos/${todo.id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
@@ -44,7 +45,7 @@ const Todo = ({ todo }: TodoProps) => {
   };
 
   const switchTodoCompletion = async (id: number, isCompleted: boolean) => {
-    const response = await fetch(`http://localhost:8000/todos/${id}`, {
+    const response = await fetch(`${API_URL}/todos/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isCompleted: !isCompleted })
