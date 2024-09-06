@@ -1,0 +1,292 @@
+openapi: "3.0.3"
+
+info:
+  title: "Todo API"
+  description: "Todo情報を提供するAPIです"
+  version: "1.0"
+
+servers:
+  - url: "http://localhost:{PORT}/"
+    description: "ローカル開発環境"
+    variables:
+      port:
+        enum: ["8000"]
+        default: "8000"
+  - url: "https://{STG_API_GATEWAY_ENDPOINT}/"
+    description: "検証環境"
+  - url: https://{API_GATEWAY_ENDPOINT}/
+    description: "本番環境で想定されるエンドポイント"
+
+tags:
+  - name: "todos"
+    description: "todoの操作"
+
+paths:
+  /:
+    get:
+      tags: ["todos"]
+      summary: todo一覧
+      description: 全てのタスクを取得する
+      responses:
+        "200":
+          description: "成功時にタスクのリストを返す"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    title:
+                      type: string
+                      example: タスクのタイトル
+                    isCompleted:
+                      type: boolean
+                      example: false
+              examples:
+                サンプル1:
+                  value:
+                    - id: 1
+                      title: ランニングする
+                      isCompleted: false
+                    - id: 2
+                      title: 勉強する
+                      isCompleted: true
+                    - id: 3
+                      title: 瞑想する
+                      isCompleted: false
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+
+        "401":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401"
+    post:
+      tags: ["todos"]
+      summary: todo登録
+      description: タスク登録する
+      parameters:
+        - name: title
+          in: query
+          description: todoのタイトル
+          required: true
+          schema:
+            type: string
+            example: ランニングする
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+
+        "401":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401"
+
+  /todos/:id:
+    put:
+      tags: ["todos"]
+      summary: todoの更新
+      description: タスクを更新する
+      parameters:
+        - name: id
+          in: path
+          description: タスクを一意に識別するID
+          required: true
+          schema:
+            type: string
+            example: 1
+        - name: title
+          in: query
+          description: タスクのタイトル
+          schema:
+            type: string
+            example: タスク1の更新
+        - name: isCompleted
+          in: query
+          description: タスクの完了ステータス
+          schema:
+            type: string
+            example: true
+      responses:
+        "200":
+          description: OK
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+
+        "401":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401"
+    delete:
+      tags: ["todos"]
+      summary: todoの削除
+      description: タスクを削除する
+      parameters:
+        - name: id
+          in: path
+          description: タスクを一意に識別するID
+          required: true
+          schema:
+            type: string
+            example: 1
+      responses:
+        "200":
+          description: OK
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+
+        "401":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 主キー
+          example: 1
+        title:
+          type: string
+          description: タスクのタイトル
+          example: ランニングする
+        isCompleted:
+          type: boolean
+          description: タスク完了フラグ
+          default: false
+          example: false
+
+    Error:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: エラーコード
+        errorMessage:
+          type: string
+          description: エラーメッセージ
+
+    Error400:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: エラーコード
+          example: E4000
+        errorMessage:
+          type: string
+          description: エラーメッセージ
+          example: 正しいリクエストを送信してください
+
+    Error401:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: エラーコード
+          example: E4001
+        errorMessage:
+          type: string
+          description: エラーメッセージ
+          example: 認証に失敗しました
+
+    Error403:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: エラーコード
+          example: E4002
+        errorMessage:
+          type: string
+          description: エラーメッセージ
+          example: アクセス権限がありません
+
+    Error404:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: エラーコード
+          example: E4003
+        errorMessage:
+          type: string
+          description: エラーメッセージ
+          example: 指定されたリソースは見つけれませんでした
+
+    Error405:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: エラーコード
+          example: E4004
+        errorMessage:
+          type: string
+          description: エラーメッセージ
+          example: 指定されたメソッドは使用することができません
+
+    Error500:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: エラーコード
+          example: E5000
+        errorMessage:
+          type: string
+          description: エラーメッセージ
+          example: サーバー側でエラーが発生しました
+
+    Error503:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: エラーコード
+          example: E5001
+        errorMessage:
+          type: string
+          description: エラーメッセージ
+          example: サーバーメンテナンス中です
